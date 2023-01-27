@@ -10,6 +10,7 @@ from sklearn.metrics import auc, accuracy_score, confusion_matrix, mean_squared_
 from sklearn.model_selection import cross_val_score, GridSearchCV, KFold, RandomizedSearchCV, train_test_split
 import sklearn.metrics
 import math
+from imblearn.over_sampling import SMOTE
 
 print(
     "shap ==",shap.__version__,
@@ -17,28 +18,51 @@ print(
     "xgboost ==",xgb.__version__
 )
 
-drop = [
-    'DateOfFirstGift',
-    'State',
-    'Zip',
-    'CustID',
-    'NeighborhoodCode',
-    'Gender',
-    'AmDonated'
-]
+
 
 add = [
-    'Age',
-    'Home',
-    'NumberOfChild',
-    'Income',
-    'Donation'
+'Age',
+'Income',
+# 'Gender',
+'PercWhite',
+'PercBlack',
+'MedAge',
+'AvgAge',
+'PercElder', 
+'PercMarr', 
+'PercSingle', 
+'MedHomeVal',
+'AvgHomeVal',
+'MedRent', 
+'AvgRent',
+'MedHousInc', 
+'MedFamInc', 
+'AvgHousInc',
+'AvgFamInc', 
+'PerCapInc', 
+'PercProf',
+'PercManage', 
+'PercSales', 
+'PercMech', 
+'PercLab',
+'PercStateBr', 
+'LifeGiftDol', 
+'LifeGiftNum', 
+'LifeGiftPromNum', 
+'MinDol', 
+'MaxDol', 
+'LastDol ',
+'AvgDol', 
+'AmDonated',
+'Donation'
 ]
 
 path = 'donation_prediction/Customer_Analytics_TrainTest.csv'
 data = pd.read_csv(path)[add] # .drop(drop,axis=1)
 
-data['Donation'].info()
+data = data.query('Age >= 18 and (AmDonated >= 20 or AmDonated == 0)').dropna().drop('AmDonated',axis=1)
+
+sum(data['Donation'] == 1)/len(data)
 
 dat = data.drop(['Donation'],axis=1)
 cols = list(data.drop(['Donation'],axis=1).columns)
@@ -46,6 +70,9 @@ cols = list(data.drop(['Donation'],axis=1).columns)
 feature_names = list(cols)
 labels = data['Donation']
 labels = labels.to_numpy()
+
+smote = SMOTE()
+dat, labels = smote.fit_resample(dat,labels)
 
 train_features, test_features = train_test_split(dat, test_size=0.5,random_state=42)
 train_labels, test_labels = train_test_split(labels, test_size=0.5,random_state=42)
@@ -79,12 +106,11 @@ params = {
 
 search = RandomizedSearchCV(xgb_model, param_distributions=params, random_state=42, n_iter=200, cv=3, verbose=1, n_jobs=-1, return_train_score=True, scoring='roc_auc')
 
-search.fit(train_features, train_labels)
+# search.fit(train_features, train_labels)
 
-report_best_scores(search.cv_results_, 1)
+# report_best_scores(search.cv_results_, 1)
 
-param = {'colsample_bytree': 0.971605192586819, 'gamma': 0.09789556739464822, 'learning_rate': 0.05080839026254963, 'max_depth': 5, 'n_estimators': 145, 'subsample': 0.6072887302606199}
-
+param =   {'colsample_bytree': 0.9751940726386727, 'gamma': 0.0684093154594807, 'learning_rate': 0.31507120614624073, 'max_depth': 5, 'n_estimators': 148, 'subsample': 0.6740531715354479}
 eval_set = [(train_features, train_labels), (test_features, test_labels)]
 
 xgb_model = xgb.XGBClassifier(objective="binary:logistic",
@@ -95,7 +121,7 @@ xgb_model = xgb.XGBClassifier(objective="binary:logistic",
                               max_depth=param['max_depth'],
                               n_estimators=param['n_estimators'],
                               subsample=param['subsample'],
-                              scale_pos_weight=c1*100,
+                              #scale_pos_weight=c1*100,
                               booster='gbtree' # gbtree, dart, gblinear
                               )
 
@@ -213,4 +239,22 @@ for title, normalize in titles_options:
     print(title)
     print(disp.confusion_matrix)
 
+plt.show()
+
+
+# SHAP
+import time
+import shap
+X_sampled = pd.DataFrame(test_features, columns=feature_names)
+explainer = shap.TreeExplainer(xgb_model)
+shap_values = explainer.shap_values(X_sampled)
+
+# # summarize the effects of all the features
+# shap.initjs()
+shap.summary_plot(shap_values, X_sampled,plot_size=[8,5])
+
+
+for i, col in enumerate(X_sampled.columns):
+    print(col,i)
+    shap.dependence_plot(col, shap_values, X_sampled, show=False)
 plt.show()
