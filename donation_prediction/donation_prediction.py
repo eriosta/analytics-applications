@@ -18,47 +18,46 @@ print(
     "xgboost ==",xgb.__version__
 )
 
-
-
-add = [
-'Age',
-'Income',
+add = {
+'Age':'Age',
+'Income':'Household Income (10,000 USD/year)',
 # 'Gender',
-'PercWhite',
-'PercBlack',
-'MedAge',
-'AvgAge',
-'PercElder', 
-'PercMarr', 
-'PercSingle', 
-'MedHomeVal',
-'AvgHomeVal',
-'MedRent', 
-'AvgRent',
-'MedHousInc', 
-'MedFamInc', 
-'AvgHousInc',
-'AvgFamInc', 
-'PerCapInc', 
-'PercProf',
-'PercManage', 
-'PercSales', 
-'PercMech', 
-'PercLab',
-'PercStateBr', 
-'LifeGiftDol', 
-'LifeGiftNum', 
-'LifeGiftPromNum', 
-'MinDol', 
-'MaxDol', 
-'LastDol ',
-'AvgDol', 
-'AmDonated',
-'Donation'
-]
+# 'PercWhite':'% Neighborhood White',
+# 'PercBlack':'% Neighborhood Black',
+# 'MedAge':'Median Age of Neighborhood Population',
+# 'AvgAge':'',
+# 'PercElder':'% Neighborhood Households with Person 65+ Living Alone', 
+# 'PercMarr':'% Neighborhood Married', 
+# 'PercSingle':'% Neighborhood Single', 
+# 'MedHomeVal':'Median Home Value in Neighborhood (100 USD)',
+# 'AvgHomeVal',
+# 'MedRent':'Median Rent in Neighborhood (100 USD)', 
+# 'AvgRent',
+# 'MedHousInc':'Median Household Income in Neighborhood (100 USD)',
+# 'MedFamInc':'Median Family Income in Neighborhood (100 USD)', 
+# 'AvgHousInc',
+# 'AvgFamInc', 
+# 'PerCapInc':'Per Capita Income in Neighborhood', 
+# 'PercProf':'% Individuals with Professional Job in Neighborhood',
+# 'PercManage':'% Individuals with Managerial Job in Neighborhood', 
+# 'PercSales':'% Individuals with Sales Job in Neighborhood', 
+# 'PercMech':'% Individuals with Mechanical (Operative, Machine) Job in Neighborhood', 
+# 'PercLab':'% Individuals with Laboral (Laborer, Handlers, Helpers) Job in Neighborhood',
+# 'PercStateBr':'% Born in State of Residence in Neighborhood', 
+'LifeGiftDol':'Dollar Amount of Lifetime Gifts', 
+'LifeGiftNum':'Number of Lifetime Gifts', 
+'LifeGiftPromNum':'Number of Lifetime Gifts to Promotions', 
+'MinDol':'Dollar Amount of Smallest Gift', 
+'MaxDol':'Dollar Amount of Largest Gift', 
+'LastDol ':'Dollar Amount of Most Recent Gift',
+'AvgDol':'Average Dollar Amount of Gifts', 
+'AmDonated':'AmDonated',
+'Donation':'Donation'
+}
+
 
 path = 'donation_prediction/Customer_Analytics_TrainTest.csv'
-data = pd.read_csv(path)[add] # .drop(drop,axis=1)
+data = pd.read_csv(path)[list(add.keys())] # .drop(drop,axis=1)
 
 data = data.query('Age >= 18 and (AmDonated >= 20 or AmDonated == 0)').dropna().drop('AmDonated',axis=1)
 
