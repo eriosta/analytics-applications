@@ -19,7 +19,7 @@ print(
 )
 
 add = {
-'Age':'Age',
+# 'Age':'Age',
 'Income':'Household Income (10,000 USD/year)',
 # 'Gender',
 # 'PercWhite':'% Neighborhood White',
@@ -51,15 +51,15 @@ add = {
 'MaxDol':'Dollar Amount of Largest Gift', 
 'LastDol ':'Dollar Amount of Most Recent Gift',
 'AvgDol':'Average Dollar Amount of Gifts', 
-'AmDonated':'AmDonated',
+# 'AmDonated':'AmDonated',
 'Donation':'Donation'
 }
 
 
 path = 'donation_prediction/Customer_Analytics_TrainTest.csv'
-data = pd.read_csv(path)[list(add.keys())] # .drop(drop,axis=1)
+data = pd.read_csv(path)[list(add.keys())].dropna().rename(columns=add) # .drop(drop,axis=1)
 
-data = data.query('Age >= 18 and (AmDonated >= 20 or AmDonated == 0)').dropna().drop('AmDonated',axis=1)
+# data = data.query('Age >= 18 and (AmDonated >= 20 or AmDonated == 0)').dropna().drop('AmDonated',axis=1)
 
 sum(data['Donation'] == 1)/len(data)
 
@@ -92,7 +92,7 @@ def report_best_scores(results, n_top=3):
             print("")
 
 # hyperparameter searching
-xgb_model = xgb.XGBClassifier(objective="binary:logistic", random_state=42, scale_pos_weight=c1*100)
+xgb_model = xgb.XGBClassifier(objective="binary:logistic", random_state=42)
 
 params = {
     "colsample_bytree": uniform(0.7, 0.3),
