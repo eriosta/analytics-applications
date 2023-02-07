@@ -25,15 +25,25 @@ from imblearn.over_sampling import SMOTE
 
 # wget.download(url)
 
-zf = zipfile.ZipFile("bank.zip") 
+# zf = zipfile.ZipFile("bank.zip") 
 
-df = pd.read_csv(zf.open('bank-full.csv'), sep=';')
+# df = pd.read_csv(zf.open('bank-full.csv'), sep=';')
+
+df = pd.read_csv('bank_marketing/bank-additional.csv', sep=';')
+
+df.rename(columns={
+    'emp.var.rate':'empvarrate',
+    'cons.price.idx':'conspriceidx',
+    'cons.conf.idx':'consconfidx',
+    'euribor3m':'euribor3m',
+    'nr.employed':'nremployed'
+},inplace=True)
 
 cols = list(df.drop(['y'],axis=1).columns)
 groupby = ['y']
 
 categorical = [
-    'job','marital','education','default','loan','housing','contact','month','poutcome'
+    'job','marital','education','default','loan','housing','contact','day_of_week','month','poutcome'
 ]
 
 mytable = TableOne(
@@ -48,10 +58,12 @@ print(mytable.tabulate(tablefmt = "fancy_grid"))
 mytable.to_excel('bank_marketing/summary.xlsx')
 
 df['y'] = np.where(df['y']=="yes",1,0)
+
+sum(df['y']==1)
 import statsmodels.formula.api as smf
 # maxiter = 35
-# model = smf.logit("isNASH ~ Age + C(Gender) + C(Race) + C(isHighBMI) + C(isHighWC) + C(isHighGluc) + C(isHighTG) + C(isLowHDL) + C(isHighHOMAIR) + C(isPreDM) + C(isDM) + C(isHighALT)", data = data).fit(maxiter=maxiter)
-model = smf.logit("y ~ age + C(job) + C(marital) + C(education) + C(default) + balance + C(housing) + C(loan) + C(contact) + day + C(month) + campaign + pdays + previous + C(poutcome)", data = df).fit()
+model = smf.logit("y ~ age + C(job) + C(marital) + C(education) + C(housing) + C(loan) + C(contact) + C(day_of_week) + C(month) + campaign + pdays + previous + C(poutcome) + empvarrate + conspriceidx + consconfidx + euribor3m + nremployed", data = df).fit()
+
 model.summary()
 model_odds = pd.DataFrame(np.exp(model.params), columns= ['OR'])
 model_odds['z-value']= model.pvalues
@@ -62,13 +74,12 @@ data = df
 
 X = data.drop(['y','duration'],axis=1)
 y = data['y'].to_numpy()
-feature_names =  list(data.drop(['y','duration'],axis=1).columns)
 
-sum(X.pdays == -1) # is this the 999?
+# sum(X.pdays == -1) # is this the 999?
 
-X['pdays'] = np.where(X['pdays']==-1,0,X['pdays'])
+X['pdays'] = np.where(X['pdays']==999,0,X['pdays'])
 
-cats = [col for col in X if X[col].dtype != np.dtype('int64')]
+cats = [col for col in X if X[col].dtype == np.dtype('object')]
 
 def transform_one_hot(data, features_to_encode):
     for feature in features_to_encode:
@@ -77,7 +88,11 @@ def transform_one_hot(data, features_to_encode):
         data = data.drop(feature,axis=1)
     return data
 
-X = transform_one_hot(X,cats).to_numpy()
+X = transform_one_hot(X,cats)
+
+feature_names =  list(X.columns)
+
+X=X.to_numpy()
 
 smote = SMOTE()
 X, y = smote.fit_resample(X,y)
@@ -86,99 +101,17 @@ from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=1)
 
-# import xgboost as xgb
-
-# def report_best_scores(results, n_top=3):
-#     for i in range(1, n_top + 1):
-#         candidates = np.flatnonzero(results['rank_test_score'] == i)
-#         for candidate in candidates:
-#             print("Model with rank: {0}".format(i))
-#             print("Mean validation score: {0:.3f} (std: {1:.3f})".format(
-#                   results['mean_test_score'][candidate],
-#                   results['std_test_score'][candidate]))
-#             print("Parameters: {0}".format(results['params'][candidate]))
-#             print("")
-
-# # hyperparameter searching
-# xgb_model = xgb.XGBClassifier(objective="binary:logistic", random_state=42)
-
-# params = {
-#     "colsample_bytree": uniform(0.7, 0.3),
-#     "gamma": uniform(0, 0.5),
-#     "learning_rate": uniform(0.03, 0.3), # default 0.1 
-#     "max_depth": randint(3, 6), # default 3
-#     "n_estimators": randint(100, 150), # default 100
-#     "subsample": uniform(0.6, 0.4)
-# }
-
-# search = RandomizedSearchCV(xgb_model, param_distributions=params, random_state=42, n_iter=200, cv=3, verbose=1, n_jobs=1, return_train_score=True, scoring='roc_auc')
-
-# search.fit(X_train, y_train)
-
-# report_best_scores(search.cv_results_, 1)
-
-# param = {'colsample_bytree': 0.944979831841473, 'gamma': 0.2195674542851092, 'learning_rate': 0.14308332882747227, 'max_depth': 5, 'n_estimators': 137, 'subsample': 0.8159124247658532}
-# eval_set = [(X_train, y_train), (X_test, y_test)]
-
-
-# xgb_model = xgb.XGBClassifier(objective="binary:logistic",
-#                               random_state=42,
-#                               colsample_bytree=param['colsample_bytree'],
-#                               gamma=param['gamma'],
-#                               learning_rate=param['learning_rate'],
-#                               max_depth=param['max_depth'],
-#                               n_estimators=param['n_estimators'],
-#                               subsample=param['subsample'],
-#                             #   scale_pos_weight=c1*100,
-#                               booster='gbtree' # gbtree, dart, gblinear
-#                               )
-
-
-# xgb_model.fit(X_train, y_train,
-#             eval_metric=["error", "logloss"],
-#               eval_set=eval_set,
-#               verbose=False)
-
 from sklearn.linear_model import LogisticRegression
+
+weight = sum(y==1) / (2 * np.bincount(y))[0]
 
 model = LogisticRegression(random_state=0, max_iter=1000).fit(X_train, y_train)
 
 model.score(X, y)
 
 y_pred = model.predict(X_test)
+
 y_pred_prob = model.predict_proba(X_test)[:, 1]
-
-# results = xgb_model.evals_result()
-# epochs = len(results["validation_0"]["error"])
-# x_axis = range(0, epochs)
-
-# # plot log loss
-# fig, ax = plt.subplots(figsize=(5,5))
-# ax.plot(x_axis, results["validation_0"]["logloss"], label="Train")
-# ax.plot(x_axis, results["validation_1"]["logloss"], label="Test")
-# ax.legend()
-# plt.ylabel("Log Loss")
-# plt.title("XGBoost Log Loss")
-# plt.show()
-# # plot classification error
-# fig, ax = plt.subplots(figsize=(5,5))
-# ax.plot(x_axis, results["validation_0"]["error"], label="Train")
-# ax.plot(x_axis, results["validation_1"]["error"], label="Test")
-# ax.legend()
-# plt.ylabel("Classification Error")
-# plt.title("XGBoost Classification Error")
-# plt.show()
-
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import RepeatedStratifiedKFold
-cv = RepeatedStratifiedKFold(n_splits=10, n_repeats=3, random_state=1)
-
-from numpy import mean
-# scores = cross_val_score(xgb_model, train_features, train_labels, scoring='roc_auc', cv=cv, n_jobs=-1)
-# print("Mean ROC AUC for Training Set: %.5f" % mean(scores))
-
-# scores = cross_val_score(xgb_model, test_features, test_labels, scoring='roc_auc', cv=cv, n_jobs=-1)
-# print("Mean ROC AUC for Test Set: %.5f" % mean(scores))
 
 
 import sklearn.metrics
@@ -223,7 +156,7 @@ matrix_metrix(y_test, y_pred, 0.4)
 
 from sklearn.metrics import plot_roc_curve, plot_confusion_matrix
 ax = plt.gca()
-rfc_disp = plot_roc_curve(xgb_model, X_test, y_test, ax=ax, alpha=0.8)
+rfc_disp = plot_roc_curve(model, X_test, y_test, ax=ax, alpha=0.8)
 plt.show()
 
 
@@ -244,7 +177,7 @@ titles_options = [
 ]
 for title, normalize in titles_options:
     disp = plot_confusion_matrix(
-        xgb_model,
+        model,
         X_test, 
         y_test,
         display_labels=['No','Yes'],
@@ -262,17 +195,16 @@ plt.show()
 import time
 import shap
 X_sampled = pd.DataFrame(X_test)
-explainer = shap.TreeExplainer(xgb_model)
+explainer = shap.LinearExplainer(model, X_sampled, feature_perturbation="interventional")
 shap_values = explainer.shap_values(X_sampled)
 
 # # summarize the effects of all the features
 # shap.initjs()
-shap.summary_plot(shap_values, X_sampled,plot_size=[8,5])
+shap.summary_plot(shap_values, X_sampled,plot_size=[8,5],feature_names=feature_names)
 
-
-# for i, col in enumerate(X_sampled.columns):
-#     print(col,i)
-#     shap.dependence_plot(col, shap_values, X_sampled, show=False)
-# plt.show()
+for i, col in enumerate(X_sampled.columns):
+    print(col,i)
+    shap.dependence_plot(col, shap_values, X_sampled, show=False,feature_names=feature_names)
+plt.show()
 
 

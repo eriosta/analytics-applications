@@ -29,7 +29,7 @@ Predict if the client will subscribe (yes/no) to a term deposit (y)
     
 ### Social and economic context attributes
 16. `emp.var.rate` : employment variation rate - quarterly indicator (numeric)
-17.   `cons.price.idx` : consumer price index - monthly indicator (numeric)     
+17. `cons.price.idx` : consumer price index - monthly indicator (numeric)     
 18. `cons.conf.idx` : consumer confidence index - monthly indicator (numeric)     
 19. `euribor3m` : euribor 3 month rate - daily indicator (numeric)
 20. `nr.employed` : number of employees - quarterly indicator (numeric)
