@@ -1,32 +1,20 @@
 import pandas as pd
 import numpy as np
+import statsmodels.formula.api as smf
 import zipfile
 from tableone import TableOne
 import wget
-import seaborn as sns
 import matplotlib.pyplot as plt
-import scipy.stats as stats
 from sklearn.metrics import classification_report
-from sklearn.utils.class_weight import compute_class_weight
-from sklearn.model_selection import cross_val_score, StratifiedKFold, train_test_split
-from sklearn.feature_selection import SelectFromModel
-from sklearn.preprocessing import StandardScaler, OneHotEncoder, PowerTransformer, PolynomialFeatures
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
+from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from scipy.stats import uniform, randint
 from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import RandomizedSearchCV, train_test_split
 from imblearn.over_sampling import SMOTE
-
-
+import shap
 
 # url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/00222/bank.zip'
-
 # wget.download(url)
-
 # zf = zipfile.ZipFile("bank.zip") 
-
 # df = pd.read_csv(zf.open('bank-full.csv'), sep=';')
 
 df = pd.read_csv('bank_marketing/bank-additional.csv', sep=';')
@@ -60,7 +48,7 @@ mytable.to_excel('bank_marketing/summary.xlsx')
 df['y'] = np.where(df['y']=="yes",1,0)
 
 sum(df['y']==1)
-import statsmodels.formula.api as smf
+
 # maxiter = 35
 model = smf.logit("y ~ age + C(job) + C(marital) + C(education) + C(housing) + C(loan) + C(contact) + C(day_of_week) + C(month) + campaign + pdays + previous + C(poutcome) + empvarrate + conspriceidx + consconfidx + euribor3m + nremployed", data = df).fit()
 
@@ -74,8 +62,6 @@ data = df
 
 X = data.drop(['y','duration'],axis=1)
 y = data['y'].to_numpy()
-
-# sum(X.pdays == -1) # is this the 999?
 
 X['pdays'] = np.where(X['pdays']==999,0,X['pdays'])
 
@@ -97,8 +83,6 @@ X=X.to_numpy()
 smote = SMOTE()
 X, y = smote.fit_resample(X,y)
 
-from sklearn.model_selection import train_test_split
-
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=1)
 
 from sklearn.linear_model import LogisticRegression
@@ -113,8 +97,6 @@ y_pred = model.predict(X_test)
 
 y_pred_prob = model.predict_proba(X_test)[:, 1]
 
-
-import sklearn.metrics
 import math
 def matrix_metrix(real_values,pred_values,beta):
    CM = confusion_matrix(real_values,pred_values,)
@@ -192,8 +174,8 @@ for title, normalize in titles_options:
 plt.show()
 
 # SHAP
-import time
-import shap
+
+
 X_sampled = pd.DataFrame(X_test)
 explainer = shap.LinearExplainer(model, X_sampled, feature_perturbation="interventional")
 shap_values = explainer.shap_values(X_sampled)
