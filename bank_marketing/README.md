@@ -118,7 +118,34 @@ It is assumed that the data set is representative of the population. The limitat
 ## Data Cleaning
 Before any analysis was performed, the data was cleaned and preprocessed to ensure that it was in the proper format for modeling. The following steps were taken during the data cleaning process: 
 ### Missing values
-There were no missing values (*NAN*). Some values were `unknown` but they were included in the analysis and model.
+There were no missing values (*NAN*). Some values were `unknown` but they were included in the analysis and model. Other missing data were depicted as `999`. We used `clean_bank_data` ([source](https://github.com/eriosta/analytics-applications/blob/main/bank_marketing/main.py)) to address all data cleaning tasks.
+
+``` python
+def clean_bank_data(filepath):
+    """
+    Reads the bank-additional.csv file, renames its columns, and replaces the 999 value in the "pdays" column with 0.
+
+    Parameters:
+    filepath (str): The file path of the csv file.
+
+    Returns:
+    pandas.DataFrame: A cleaned DataFrame of the bank-additional data.
+    """
+    df = pd.read_csv(filepath, sep=';')
+
+    df.rename(columns={
+        'emp.var.rate':'empvarrate',
+        'cons.price.idx':'conspriceidx',
+        'cons.conf.idx':'consconfidx',
+        'euribor3m':'euribor3m',
+        'nr.employed':'nremployed'
+    }, inplace=True)
+
+    df['pdays'] = np.where(df['pdays']==999,0,df['pdays'])
+
+    return df
+```
+
 ### Duplicate values
 There were no duplicate values. 
 ### Outliers
