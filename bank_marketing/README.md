@@ -7,6 +7,9 @@ Direct marketing campaigns through phone calls have been a popular method of pro
 # Methodology
 The objective of this study was to predict the binary variable of whether a client has subscribed to a term deposit using logistic regression. To achieve this objective, the following methodology was employed. 
 ## Identification, classification and operationalization of variables 
+
+The Bank Marketing Data Set is a collection of data that was collected from a Portuguese banking institution in order to study the effectiveness of telemarketing campaigns. The data was collected over the course of a year and contains information on the bank's telemarketing calls, such as the outcome of the call (e.g., success or failure), the customer's age, job, and marital status, as well as other demographic information. The data set also includes information on the customer's previous contact with the bank, such as previous calls, as well as the outcome of those calls. The data set was published in a paper by S. Moro, P. Cortez, and P. Rita in 2014, and it is available for download from the UCI Machine Learning Repository. The data set is often used as a benchmark for machine learning models and is a popular choice for testing and evaluating new algorithms in the field of marketing and customer relationship management.
+
 The data set consisted of 20 variables, including demographic, economic, and social factors of clients, as well as information about the previous marketing campaigns. The target variable was the binary variable of whether a client has subscribed to a term deposit (“Yes” or “No”). 
 
 ### Bank client data
@@ -41,38 +44,85 @@ The data set consisted of 20 variables, including demographic, economic, and soc
 21. `y` : has the client subscribed a term deposit? (binary: "yes","no")
 
 ## Sampling techniques 
-The original data set was imbalanced in terms of the target variable, as only 40% of the clients subscribed to a term deposit. To overcome this imbalance, the data was oversampled using the SMOTE (Synthetic Minority Over-sampling Technique) algorithm from the imblearn library.
+The file `bank-additional.csv` consists of 10% of the examples (N=4119), randomly selected from the original dataset. In addition, the original data set was imbalanced in terms of the target variable, as only 40% of the clients subscribed to a term deposit. To overcome this imbalance, the data was oversampled using the SMOTE (Synthetic Minority Over-sampling Technique) algorithm from the `imblearn` library.
 ## Data collection process
-The data was collected from a .csv file named bank-additional.csv, which was imported using the Pandas library (pd.read_csv) with a separator of ';'. The data was considered primary data and was used for this study. 
-Modeling analysis and techniques used
+The data was collected from `bank-additional.csv`. The data was considered primary data and was used for this study. 
+## Modeling analysis and techniques used
 To achieve the objective of this study, the following modeling analysis and techniques were used: 
 ### Train-Test Split
-The transformed data was split into a training set (67%) and a test set (33%) using the train_test_split function from the sklearn library. 
+The transformed data was split into a training set (67%) and a test set (33%) using the `train_test_split` function from the `sklearn` library. 
 ### Logistic Regression Model
-A logistic regression model was fitted on the training data using the LogisticRegression class from the sklearn library. The random state was set to 0 and the maximum iteration was set to 1000. The model's accuracy was calculated using the score method. 
+A logistic regression model was fitted on the training data using the `LogisticRegression` class from the `sklearn` library. The random state was set to 0 and the maximum iteration was set to 1000. The model's accuracy was calculated using the score method. 
 ### Model Prediction
-The model was used to predict the target variable on the test data and stored in y_pred. The probabilities of the predictions were stored in y_pred_prob. 
+The model was used to predict the target variable on the test data and stored in `y_pred`. The probabilities of the predictions were stored in `y_pred_prob`. 
 ### Model Evaluation
-The model's performance was evaluated using the confusion matrix, which was calculated using the confusion_matrix function from the sklearn library.
+The model's performance was evaluated using the confusion matrix, which was calculated using the confusion_matrix function from the `sklearn` library.
+### Model Interpretation using SHAP
+SHAP (SHapley Additive exPlanations) is a unified approach to explain the output of any machine learning model. It provides an interpretable and model-agnostic explanation of a prediction, by breaking down the prediction into contributions from each feature. In the case of a logistic regression model, SHAP values represent the contribution of each feature to the prediction of a binary outcome (e.g., success or failure in a marketing campaign).
+
+In Python, SHAP values can be easily computed for a logistic regression model using the `shap` library. Here is a generic example:
+
+```python
+import shap
+from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import load_breast_cancer
+
+X = data['predictors']
+y = data['target']
+
+# train a logistic regression model
+model = LogisticRegression()
+model.fit(X, y)
+
+# compute the SHAP values for the model
+explainer = shap.Explainer(model.predict_proba, X)
+shap_values = explainer(X)
+```
+
+The `shap_values` variable will contain the SHAP values for each feature for each observation in the data set. These values can be used to gain insights into which features are driving the predictions of the logistic regression model.
+
+It's important to note that SHAP values have some desirable properties, such as consistency and fairness, that make them a good choice for interpretable machine learning. For more information on the theory and implementation of SHAP values, We recommend reading the original paper by Lundberg and Lee (2017).
+
+
 ## Methodological assumptions and limitations
 It is assumed that the data set is representative of the population. The limitations of this study include the potential for bias in the data set and the limited number of variables included in the analysis.
 # Data
 ## Data Cleaning
 Before any analysis was performed, the data was cleaned and preprocessed to ensure that it was in the proper format for modeling. The following steps were taken during the data cleaning process: 
 ### Missing values
-Any missing values in the data were detected and dealt with. In this study, there were no missing values, so this step was not necessary.
+There were no missing values (*NAN*). Some values were `unknown` but they were included in the analysis and model.
 ### Duplicate values
-Any duplicate values in the data were detected and removed. In this study, there were no duplicate values, so this step was not necessary. 
+There were no duplicate values. 
 ### Outliers
-Outliers were detected and dealt with appropriately. In this study, the outliers were not removed as they were considered relevant to the target variable. 
+Outliers were not removed as they were considered relevant to the target variable. 
 ## Data Transformation
-After the data cleaning process was completed, the data was transformed. The categorical variables were transformed into numerical values through one-hot encoding with the function  `transform_one_hot`. 
+After the data cleaning process was completed, the data was transformed. The categorical variables were transformed into numerical values through one-hot encoding with the function  `transform_one_hot` ([source](https://github.com/eriosta/analytics-applications/blob/main/bank_marketing/main.py))
+
+```python
+def transform_one_hot(data, features_to_encode):
+    """
+    Transform categorical features in a pandas DataFrame into one-hot encoded features.
+
+    Parameters:
+    data (pandas.DataFrame): The input DataFrame to be transformed.
+    features_to_encode (list): A list of the names of the categorical features to be transformed.
+
+    Returns:
+    pandas.DataFrame: The transformed DataFrame with one-hot encoded features.
+    """
+    for feature in features_to_encode:
+        one_hot = (pd.get_dummies(data[feature])).add_prefix(feature + '_')
+        data = data.join(one_hot)
+        data = data.drop(feature,axis=1)
+    return data
+```
+
 ## Data Limitations
-The data used in this study had a limited sample size, which may have affected the accuracy of the results. Additionally, the data was collected from a specific bank and may not be generalizable to other banks or industries. The study was limited to the available data and was not able to explore other relevant factors that may have an impact on the target variable. It is recommended that future studies consider larger sample sizes and a wider range of variables to increase the robustness of the results.
+The data used in this study had a limited sample size, which may have affected the accuracy of the results. Additionally, the data was collected from a specific bank and may not be generalizable to other banks or industries. The study was limited to the available data and was not able to explore other relevant factors that may have an impact on the target variable. We recommend that future studies consider larger sample sizes and a wider range of variables to increase the robustness of the results.
 # Findings
 ## Results
 ### Summary statistics
-The results of our study indicate that there are significant differences between individuals who subscribed to a term deposit and those who did not. The mean age of individuals who subscribed was 41.9 years old with a standard deviation of 13.3. In comparison, the proportion of job categories, marital status, education status, default status, contact, month, duration, campaign, pdays, previous count, poutcome, empvarrate, conspriceidx, euribor3m, and nremployed were all significantly different between the two groups (p<0.001). 
+The results of our study indicate that there are significant differences between individuals who subscribed to a term deposit and those who did not. The mean `age` of individuals who subscribed was 41.9 years old with a standard deviation of 13.3. In comparison, the proportion of `job` categories, `marital` status, `education` status, `default` status, `contact`, `month`, `duration`, `campaign`, `pdays`, `previous` count, `poutcome`, `empvarrate`, `conspriceidx`, `euribor3m`, and `nremployed` were all significantly different between the two groups (*p*<0.001). 
 
 <table border="1" class="dataframe">
   <thead>
@@ -677,7 +727,7 @@ The results of our study indicate that there are significant differences between
 </table>
 
 ### Model performance
-In terms of prediction metrics, the prevalence of the target variable was 40%. The accuracy of the model was 74%, with a sensitivity (TPR, recall) of 64% and a specificity (TNR) of 83%. The F1 score was 70% and the AUROC was 80%.
+The prevalence of the target variable was 40%. The accuracy of the model was 74%, with a sensitivity (TPR, recall) of 64% and a specificity (TNR) of 83%. The F1 score was 70% and the AUROC was 80%.
 
 ### SHAP values
 The top 5 predictors of the model were found to be nremployed, conspriceidx, euribor3m, campaign, and age. The SHAP values indicate that these variables have the greatest impact on the prediction of the target variable.
@@ -696,10 +746,12 @@ The logistic regression model used in this study is a widely used method for pre
 
 Additionally, clustering methods, such as K-means or hierarchical clustering, could be used to group clients with similar characteristics and target marketing efforts to these groups. In conclusion, this study provides valuable insights into the variables that influence a client's decision to subscribe to a term deposit. We hope that our findings and recommendations will help the bank improve their marketing efforts and increase their success in selling term deposits.
 # Sources
-1. "The impact of direct marketing on customer behavior: a study of banks." by Okeke, J. A., & Ilo, O. E. (2013). *African Journal of Business Management, 7*(30), 1672-1679.
-   
-2. "A study of factors affecting direct marketing campaign success in the banking industry." by Kim, S., Kim, S., & Kim, K. (2015). *Asia Pacific Journal of Marketing and Logistics, 27*(2), 191-208.
+Okeke, J. A., & Ilo, O. E. (2013). The impact of direct marketing on customer behavior: a study of banks. African Journal of Business Management, 7(30), 1672-1679.
 
-3. "Direct marketing and customer behavior: a case of banking industry in Pakistan." by Shabbir, M. S., & Akhtar, N. (2013). *Journal of Marketing and Management, 3*(2), 105-123.
+Kim, S., Kim, S., & Kim, K. (2015). A study of factors affecting direct marketing campaign success in the banking industry. Asia Pacific Journal of Marketing and Logistics, 27(2), 191-208.
+
+Shabbir, M. S., & Akhtar, N. (2013). Direct marketing and customer behavior: a case of banking industry in Pakistan. Journal of Marketing and Management, 3(2), 105-123.
+
+Lundberg, S. M., & Lee, S. I. (2017). A Unified Approach to Interpreting Model Predictions. arXiv preprint arXiv:1705.07874.
 
 
