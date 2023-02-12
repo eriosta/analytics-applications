@@ -81,6 +81,7 @@ def generate_summary_table(df, y_column, categorical_columns):
 
     # Save the summary table to an Excel file
     mytable.to_excel('summary.xlsx')
+    mytable.to_html('summary.html')
 
     return mytable
 
