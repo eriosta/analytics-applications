@@ -729,6 +729,17 @@ The results of our study indicate that there are significant differences between
 ### Model performance
 The prevalence of the target variable was 40%. The accuracy of the model was 74%, with a sensitivity (TPR, recall) of 64% and a specificity (TNR) of 83%. The F1 score was 70% and the AUROC was 80%.
 
+![auroc](https://user-images.githubusercontent.com/84827743/218338992-9967440f-a66b-46d8-af82-d6712ff3e212.png)
+
+
+![normmat](https://user-images.githubusercontent.com/84827743/218339004-25b8b4ef-925f-4fd2-b1bc-c4d1d717e84d.png)
+
+
+![rawmat](https://user-images.githubusercontent.com/84827743/218339009-4bb43684-91a0-4da8-acfb-01c81cd5673d.png)
+
+
+![shap](https://user-images.githubusercontent.com/84827743/218339012-627a9091-82a6-4f66-9d30-0e59b377a0af.png)
+
 ### SHAP values
 The top 5 predictors of the model were found to be nremployed, conspriceidx, euribor3m, campaign, and age. The SHAP values indicate that these variables have the greatest impact on the prediction of the target variable.
 
