@@ -1,6 +1,30 @@
 [![Jupyter Notebook](https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white)](https://github.com/eriosta/analytics-applications/blob/main/bank_marketing/bank_marketing.ipynb)
 [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/eriosta/analytics-applications/tree/main/bank_marketing)
 
+# Table of contents
+1. Executive summary
+2. Problem statement
+3. Review of related literature
+4. Methodology
+   1. Identification, classification and operationalization of variables
+   2. Statements of hypotheses being tested and/or models being developed
+   3. Sampling techniques
+   4. Data collection process
+   5. Modeling analysis/techniques used
+   6. Methodological assumptions and limitations
+5. Data
+   1. Data cleaning
+   2. Data preprocessing
+   3. Data limitations
+6. Findings
+   1. Results
+      1. Summary statistics
+      2. Prediction metrics
+      3. SHAP values
+   2. Discussion
+7. Conclusions and recommendations
+   1. Alternative methodologies
+8. Sources and citations
 
 # Executive summary
 This study used logistic regression to predict whether a client would subscribe to a term deposit in a bank. The data was obtained from a .csv file and preprocessed using one-hot encoding. The model was trained and evaluated using a training set (67%) and test set (33%) with accuracy of 74%, sensitivity of 64%, specificity of 83%, F1 of 71% and AUROC of 80%. The top 5 predictors of subscription were nremployed, conspriceidx, euribor3m, campaign, and age. The results can be useful for banks in targeting potential customers, but it is important to consider the limitations of the study and explore alternative methodologies.
