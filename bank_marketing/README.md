@@ -126,7 +126,7 @@ The data used in this study had a limited sample size, which may have affected t
 # Findings
 ## Results
 ### Summary statistics
-The results of our study indicate that there are significant differences between individuals who subscribed to a term deposit and those who did not. The mean `age` of individuals who subscribed was 41.9 years old with a standard deviation of 13.3. In comparison, the proportion of `job` categories, `marital` status, `education` status, `default` status, `contact`, `month`, `duration`, `campaign`, `pdays`, `previous` count, `poutcome`, `empvarrate`, `conspriceidx`, `euribor3m`, and `nremployed` were all significantly different between the two groups (*p*<0.001). 
+The results of our study indicate that there are significant differences between individuals who subscribed to a term deposit and those who did not. The mean `age` of individuals who subscribed was 41.9 years old (SD 13.3). In comparison, the proportion of `job` categories, `marital` status, `education` status, `default` status, `contact`, `month`, `duration`, `campaign`, `pdays`, `previous` count, `poutcome`, `empvarrate`, `conspriceidx`, `euribor3m`, and `nremployed` were all significantly different between the two groups (*p*<0.001). 
 
 <table border="1" class="dataframe">
   <thead>
