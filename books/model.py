@@ -8,7 +8,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, mean_squared_error, mean_absolute_error, roc_auc_score, confusion_matrix
 import shap
-
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 class BBBC_Model:
     """
@@ -48,8 +50,42 @@ class BBBC_Model:
         self.test_path = test_path
 
     def load_data(self):
-        data = pd.read_csv(self.data_path)
+        if self.data_path:
+            data = pd.read_csv(self.data_path)
+        else:
+            data = pd.concat([pd.read_csv(self.train_path), pd.read_csv(self.test_path)], ignore_index=True)
         return data
+    
+    def analyze_high_cardinality(self, data, columns, threshold=0.9):
+        """
+        This method analyzes high cardinality between variables in a pandas DataFrame.
+        :param data: pandas DataFrame
+        :param columns: list of column names to analyze
+        :param threshold: threshold for the proportion of unique values to the number of rows
+        :return: a list of columns with high cardinality
+        """
+        high_cardinality_columns = []
+        for col in columns:
+            if len(data[col].unique()) / data.shape[0] > threshold:
+                high_cardinality_columns.append(col)
+        return high_cardinality_columns
+    
+    def spearman_correlation(self, data, response_var=None):
+        """
+        This method performs Spearman correlation and visualizes the correlation matrix.
+        :param data: pandas DataFrame
+        :param response_var: name of the response variable (optional)
+        """
+        if response_var:
+            corr = data.drop(response_var, axis=1).corr(method='spearman')
+        else:
+            corr = data.corr(method='spearman')
+        sns.set(style="white")
+        mask = np.triu(np.ones_like(corr, dtype=bool))
+        f, ax = plt.subplots(figsize=(11, 9))
+        cmap = sns.diverging_palette(230, 20, as_cmap=True)
+        sns.heatmap(corr, mask=mask, cmap=cmap, center=0, square=True, linewidths=.5, cbar_kws={"shrink": .5})
+        plt.show()
 
     def preprocess_data(self, data=None):
         """
@@ -104,8 +140,29 @@ class BBBC_Model:
         model = SVC(kernel='rbf', C=100, probability=True)
         model.fit(X_train, y_train)
         return model
+    
+    def predict(self, model, X_new):
+        y_pred = model.predict(X_new)
+        return y_pred
 
     def evaluate_model(self, model, X_test, y_test):
+        """
+        Evaluates the performance of the given model on the test data.
+
+        Parameters:
+        ----------
+        model : object
+            The trained model to evaluate.
+        X_test : pandas DataFrame
+            The test data features.
+        y_test : pandas DataFrame
+            The test data response variable.
+
+        Returns:
+        -------
+        dict
+            A dictionary of evaluation metrics.
+        """
         y_pred = model.predict(X_test)
         if hasattr(model, "predict_proba"):
             y_prob = model.predict_proba(X_test)[:, 1]  # probability of positive class
@@ -125,6 +182,18 @@ class BBBC_Model:
 
     
     def select_best_model(self):
+        """
+        Builds and evaluates three different models (linear regression, logistic regression, and SVM) on the training and testing sets of the given data. The method prints the evaluation metrics for each model and returns the best-performing model based on weighted scores.
+
+        Parameters:
+        ----------
+        None
+
+        Returns:
+        -------
+        tuple
+            A tuple containing the name of the best-performing model and the trained model object.
+        """
         if self.train_path is not None and self.test_path is not None:
             X_train, X_test, y_train, y_test = self.preprocess_data()
         else:
@@ -175,7 +244,23 @@ class BBBC_Model:
 
         return best_model, model
     
-    def shap_analysis(self, model, X_test):
+    def shap_analysis(self, model, X_test, plot_dependence=False):
+        """
+        Performs SHAP analysis on the given model and test data and visualizes the SHAP values for the first instance in the test data. Optionally, the method can also visualize two-way dependence plots for each feature.
+
+        Parameters:
+        ----------
+        model : object
+            The trained model to analyze.
+        X_test : pandas DataFrame
+            The test data features.
+        plot_dependence : bool, optional
+            Whether to plot two-way dependence plots for each feature.
+
+        Returns:
+        -------
+        None
+        """
         # Initialize the SHAP explainer for the given model and test data
         explainer = shap.Explainer(model, X_test)
 
@@ -184,8 +269,30 @@ class BBBC_Model:
 
         # Visualize the SHAP values for the first instance in the test data
         shap.plots.waterfall(shap_values[0], max_display=10)
+        
+        # Visualize two-way dependence plots for each feature
+        if plot_dependence:
+            for feature in X_test.columns:
+                shap.plots.scatter(shap_values[:, feature], color=shap_values)
+
 
 class ModelAnalyzer:
+    """
+    A class for analyzing and visualizing the coefficients of a linear, logistic, or SVM model.
+
+    Parameters:
+    ----------
+    model_type : str
+        The type of model to analyze. Must be one of 'linear', 'logistic', or 'svm'.
+    X_train : pandas DataFrame
+        The training data features.
+    y_train : pandas DataFrame
+        The training data response variable.
+
+    Returns:
+    -------
+    None
+    """
     def __init__(self, model_type, X_train, y_train):
         self.model_type = model_type
         self.X_train = X_train
@@ -196,6 +303,17 @@ class ModelAnalyzer:
         self.upper_cis = None
         
     def analyze(self):
+        """
+        Trains the model and extracts the coefficient values and 95% CIs.
+
+        Parameters:
+        ----------
+        None
+
+        Returns:
+        -------
+        None
+        """
         if self.model_type == 'linear':
             # Train a linear regression model
             model = sm.OLS(self.y_train, self.X_train)
@@ -244,6 +362,18 @@ class ModelAnalyzer:
             self.upper_cis = self.summary_table['0.975]']
 
     def get_covariate_table(self):
+        """
+        Creates a table of covariates, coefficients, and 95% CIs.
+
+        Parameters:
+        ----------
+        None
+
+        Returns:
+        -------
+        covariate_table : pandas DataFrame
+            A table of covariates, coefficients, and 95% CIs.
+        """
         # Create a table of covariates, coefficients, and 95% CIs
         covariate_table = pd.DataFrame({'Covariate': self.X_train.columns,
                                         'Coefficient': self.coefs,
