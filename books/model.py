@@ -245,35 +245,41 @@ class BBBC_Model:
         return best_model, model
     
     def shap_analysis(self, model, X_test, plot_dependence=False):
-        """
-        Performs SHAP analysis on the given model and test data and visualizes the SHAP values for the first instance in the test data. Optionally, the method can also visualize two-way dependence plots for each feature.
+            """
+            Performs SHAP analysis on the given model and test data and visualizes the SHAP values for the first instance in the test data. Optionally, the method can also visualize two-way dependence plots for each feature.
 
-        Parameters:
-        ----------
-        model : object
-            The trained model to analyze.
-        X_test : pandas DataFrame
-            The test data features.
-        plot_dependence : bool, optional
-            Whether to plot two-way dependence plots for each feature.
+            Parameters:
+            ----------
+            model : object
+                The trained model to analyze.
+            X_test : pandas DataFrame
+                The test data features.
+            plot_dependence : bool, optional
+                Whether to plot two-way dependence plots for each feature.
 
-        Returns:
-        -------
-        None
-        """
-        # Initialize the SHAP explainer for the given model and test data
-        explainer = shap.Explainer(model, X_test)
+            Returns:
+            -------
+            None
+            """
+            # Initialize the SHAP explainer for the given model and test data
+            explainer = shap.Explainer(model, X_test)
 
-        # Compute SHAP values for the test data
-        shap_values = explainer(X_test)
+            # Compute SHAP values for the test data
+            shap_values = explainer(X_test)
 
-        # Visualize the SHAP values for the first instance in the test data
-        shap.plots.waterfall(shap_values[0], max_display=10)
-        
-        # Visualize two-way dependence plots for each feature
-        if plot_dependence:
-            for feature in X_test.columns:
-                shap.plots.scatter(shap_values[:, feature], color=shap_values)
+            # Visualize the SHAP values for the first instance in the test data
+            shap.plots.waterfall(shap_values[0], max_display=10)
+            
+            # Compute the SHAP summary plot
+            shap.summary_plot(shap_values, X_test)
+
+            # Show the plot
+            plt.show()
+            
+            # Visualize two-way dependence plots for each feature
+            if plot_dependence:
+                for feature in X_test.columns:
+                    shap.plots.scatter(shap_values[:, feature], color=shap_values)
 
 
 class ModelAnalyzer:
