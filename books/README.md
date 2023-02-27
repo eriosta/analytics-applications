@@ -9,7 +9,7 @@ Based on the performance metrics, it may be beneficial for BBBC to develop exper
 Bookbinders Book Club (BBBC) is a distributor of specialty books through direct marketing. In anticipation of using database marketing, BBBC made a strategic decision to build and maintain a detailed database about its members containing all relevant information about them. The company is exploring whether to use predictive modeling approaches to improve the efficacy of its direct mail program. The objective of this analysis is to identify the factors that influence book purchasing behavior based on customer characteristics, to help BBBC develop a response model that can be used to improve the efficacy of its direct mail program.
 
 # Literature Review
-Describe use of machine learning in prediction of book buying behavio based on customer characteristics
+Machine learning approaches have been used extensively in predicting book buying behavior based on customer characteristics. For example, regression models and decision trees have been used to predict the likelihood of purchase based on demographic and transactional data. Neural networks have also been used to predict book buying behavior based on a wide range of features, including customer behavior on social media platforms, product ratings and reviews, and sentiment analysis of customer reviews. These methods have been shown to be effective in predicting book buying behavior, and can help companies like BBBC develop more targeted and effective direct mail campaigns.
 
 # Methods
 ## Variables
@@ -153,7 +153,14 @@ The `analyze_high_cardinality` method identifies columns in the data that have h
 
 The `spearman_correlation` method performs Spearman correlation on the data and visualizes the correlation matrix.
 
-
+## Summary Statistics
+* `Gender`: The mean difference is -0.164, which suggests that the proportion of males in the `Choice==1` group is lower than that in the `Choice==0` group. The Satterthwaite t-test statistic is 7.52, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
+* `Amount_purchased`: The mean difference is 24.12, which suggests that the `Choice==1` group tends to purchase more than the `Choice==0` group. The Mann-Whitney U test statistic is 8.53e+05, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
+* `Frequency`: The mean difference is -4.41, which suggests that the `Choice==1` group tends to have lower frequency of purchases compared to the `Choice==0` group. The Satterthwaite t-test statistic is 15.38, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
+* `Last_purchase`: The mean difference is 0.87, which suggests that the `Choice==1` group tends to have a more recent last purchase compared to the `Choice==0` group. The Satterthwaite t-test statistic is -5.91, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
+* `First_purchase`: The mean difference is -0.51, which suggests that the `Choice==1` group tends to have a later first purchase compared to the `Choice==0` group, but this difference is not statistically significant at the 0.05 level (p-value = 0.502).
+* `P_Child`, `P_Youth`, `P_Cook`, `P_DIY`: The mean differences for these covariates are small and not statistically significant, based on the p-values being greater than 0.05.
+* `P_Art`: The mean difference is 0.57, which suggests that the "Other" group tends to purchase more from the Art department compared to the non-"Other" group. The Satterthwaite t-test statistic is -14.58, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
 
 # Results
 ## Performance
@@ -173,8 +180,6 @@ In the logistic regression model, the coefficients for the covariates represent 
 It is difficult to compare the magnitude of the coefficients between the two models since they are on different scales. However, it is possible to compare the direction of the coefficients. In this case, we can see that the direction of the coefficients is generally the same between the two models, meaning that an increase in the input variable leads to a corresponding increase or decrease in the outcome variable, depending on the sign of the coefficient.
 
 In terms of the specific coefficients for the covariates, there are some differences between the two models. For example, the coefficient for the gender variable is negative in both models, but the magnitude is larger in the logistic regression model. Similarly, the coefficient for the last purchase variable is positive in both models, but the magnitude is larger in the logistic regression model. This could be due to the fact that the outcome variable is binary in the logistic regression model, and the model is trying to predict the probability of the outcome being positive or negative. Therefore, the coefficients are adjusted to account for the nonlinearity of the logistic function used to model the probability of the outcome variable.
-
-## SHAP Analysis
 
 # Conclusion
 
