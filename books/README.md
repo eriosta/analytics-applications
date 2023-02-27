@@ -1,3 +1,6 @@
+[![Jupyter Notebook](https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white)](https://github.com/eriosta/analytics-applications/blob/main/books/main.ipynb)
+[![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/eriosta/analytics-applications/tree/main/books)
+
 # Executive Summary
 In this analysis, we used data from Bookbinders Book Club (BBBC) to explore the use of predictive modeling approaches to improve the efficacy of its direct mail program. Specifically, we analyzed a subset of the database containing data for customers who purchased the book and customers who did not, to identify the factors that influence book purchasing behavior.
 
@@ -145,6 +148,8 @@ Linear regression, logistic regression, and SVM are all commonly used machine le
 </table>
 
 ## Documentation
+
+[Source code](https://github.com/eriosta/analytics-applications/blob/main/books/model.py)
 
 ### Class `BBBC_Model`
 The `BBBC_Model` class provides a collection of methods for building, training, evaluating, and selecting the best model for a binary classification problem based on customer purchase behavior. Here is the high-level documentation for the classes and their methods:
