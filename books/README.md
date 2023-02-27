@@ -144,6 +144,135 @@ Linear regression, logistic regression, and SVM are all commonly used machine le
     </tr>
 </table>
 
+## Documentation
+
+### Class `BBBC_Model`
+The `BBBC_Model` class provides a collection of methods for building, training, evaluating, and selecting the best model for a binary classification problem based on customer purchase behavior. Here is the high-level documentation for the classes and their methods:
+
+#### Attributes
+`data_path` : str
+
+The path to the data file.
+
+`response_var` : str
+
+The dependent variable for the analysis - purchase or no purchase of the book.
+
+`test_size` : float
+
+The proportion of the data to use for testing the models. Default is 0.2.
+
+`train_path` : str or None
+
+The path to the CSV file containing the custom training set.
+
+`test_path` : str or None
+
+The path to the CSV file containing the custom testing set.
+
+#### Methods
+`__init__(self, data_path=None, response_var=None, test_size=0.2, train_path=None, test_path=None)`
+
+Initializes the class with the given parameters.
+
+`load_data(self)`
+
+Loads the data from the specified file or the training and testing CSV files.
+
+`analyze_high_cardinality(self, data, columns, threshold=0.9)`
+
+Analyzes high cardinality between variables in a pandas DataFrame.
+
+`spearman_correlation(self, data, response_var=None)`
+
+Performs Spearman correlation and visualizes the correlation matrix.
+
+`summarize_stats(self, data, response_var=None)`
+
+Performs summary statistics between `response_var==1` and `response_var==0` and generates a table with the following:
+- variable name
+- mean difference
+- test type (t-test, Mann-Whitney U test, etc.)
+- statistic
+- p-value
+- confidence intervals
+
+`preprocess_data(self, data=None)`
+
+Preprocesses the data by removing missing values, creating dummy variables, and splitting into training and testing sets.
+
+`build_linear_model(self, X_train, y_train)`
+
+Builds and trains a linear regression model.
+
+`build_logit_model(self, X_train, y_train)`
+
+Builds and trains a logistic regression model.
+
+`build_svm_model(self, X_train, y_train)`
+
+Builds and trains a support vector machine model.
+
+`predict(self, model, X_new)`
+
+Predicts the class label of new instances using the given model.
+
+`evaluate_model(self, model, X_test, y_test)`
+
+Evaluates the performance of the given model on the test data.
+
+`select_best_model(self)`
+Builds, trains, and evaluates several models and selects the best-performing model based on the F1 score.
+
+`shap_analysis(self, model, X_test, plot_dependence=False)`
+
+Performs SHAP analysis on the given model and test data and visualizes the SHAP values for the first instance in the test data. Optionally, the method can also visualize two-way dependence plots for each feature.
+
+### Clas `ModelAnalyzer`
+
+The `ModelAnalyzer` class is a Python class designed to analyze and visualize the coefficients of a linear, logistic, or SVM model. The class contains three main methods: `__init__()`, `analyze()`, and `get_covariate_table()`.
+
+#### Attributes:
+`model_type`
+
+A string that specifies the type of model to analyze ('linear', 'logistic', or 'svm').
+
+`X_train`
+
+A pandas DataFrame containing the training data features.
+
+`y_train`
+
+A pandas DataFrame containing the training data response variable.
+
+`summary_table`
+
+A summary table of coefficient values and 95% CIs, created by the `analyze()` method. This attribute is set if the `model_type` is 'linear' or 'logistic'.
+
+`coefs`
+
+An array of coefficient values, created by the `analyze()` method.
+
+`lower_cis`
+
+An array of lower bounds for the 95% CIs of the coefficient values, created by the `analyze()` method.
+
+`upper_cis`
+
+An array of upper bounds for the 95% CIs of the coefficient values, created by the `analyze()` method.
+
+#### Methods
+`init(self, model_type, X_train, y_train)`
+
+This is the constructor method for the `ModelAnalyzer` class. It takes three arguments: `model_type`, which specifies the type of model to analyze ('linear', 'logistic', or 'svm'); `X_train`, which is a pandas DataFrame containing the training data features; and `y_train`, which is a pandas DataFrame containing the training data response variable.
+
+`analyze(self)`
+
+This method trains the specified model type and extracts the coefficient values and 95% CIs. The method does not take any arguments. If the model_type is 'linear' or 'logistic', the method trains a regression model using the `statsmodels` package and creates a summary table containing the coefficient values and 95% CIs. If the `model_type` is 'svm', the method trains an SVM model using `scikit-learn` and bootstrap resamples the data to obtain 95% CIs. The method sets the `coefs`, `lower_cis`, and `upper_cis` attributes of the class instance.
+
+`get_covariate_table(self)`
+
+This method creates a table of covariates, coefficients, and 95% CIs. The method does not take any arguments. The method returns a pandas DataFrame containing the covariate names, coefficient values, and 95% CIs. The table is created using the `coefs`, `lower_cis`, and `upper_cis` attributes that were set by the `analyze()` method.
 
 # Data
 ## Preprocessing
@@ -154,13 +283,23 @@ The `analyze_high_cardinality` method identifies columns in the data that have h
 The `spearman_correlation` method performs Spearman correlation on the data and visualizes the correlation matrix.
 
 ## Summary Statistics
-* `Gender`: The mean difference is -0.164, which suggests that the proportion of males in the `Choice==1` group is lower than that in the `Choice==0` group. The Satterthwaite t-test statistic is 7.52, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
-* `Amount_purchased`: The mean difference is 24.12, which suggests that the `Choice==1` group tends to purchase more than the `Choice==0` group. The Mann-Whitney U test statistic is 8.53e+05, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
-* `Frequency`: The mean difference is -4.41, which suggests that the `Choice==1` group tends to have lower frequency of purchases compared to the `Choice==0` group. The Satterthwaite t-test statistic is 15.38, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
-* `Last_purchase`: The mean difference is 0.87, which suggests that the `Choice==1` group tends to have a more recent last purchase compared to the `Choice==0` group. The Satterthwaite t-test statistic is -5.91, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
-* `First_purchase`: The mean difference is -0.51, which suggests that the `Choice==1` group tends to have a later first purchase compared to the `Choice==0` group, but this difference is not statistically significant at the 0.05 level (p-value = 0.502).
-* `P_Child`, `P_Youth`, `P_Cook`, `P_DIY`: The mean differences for these covariates are small and not statistically significant, based on the p-values being greater than 0.05.
-* `P_Art`: The mean difference is 0.57, which suggests that the "Other" group tends to purchase more from the Art department compared to the non-"Other" group. The Satterthwaite t-test statistic is -14.58, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
+`Gender`: The mean difference is -0.164, which suggests that the proportion of males in the `Choice==1` group is lower than that in the `Choice==0` group. The Satterthwaite t-test* statistic is 7.52, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
+
+`Amount_purchased`: The mean difference is 24.12, which suggests that the `Choice==1` group tends to purchase more than the `Choice==0` group. The Mann-Whitney U test** statistic is 8.53e+05, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
+
+`Frequency`: The mean difference is -4.41, which suggests that the `Choice==1` group tends to have lower frequency of purchases compared to the `Choice==0` group. The Satterthwaite t-test statistic is 15.38, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
+
+`Last_purchase`: The mean difference is 0.87, which suggests that the `Choice==1` group tends to have a more recent last purchase compared to the `Choice==0` group. The Satterthwaite t-test statistic is -5.91, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
+
+`First_purchase`: The mean difference is -0.51, which suggests that the `Choice==1` group tends to have a later first purchase compared to the `Choice==0` group, but this difference is not statistically significant at the 0.05 level (p-value = 0.502).
+
+`P_Child`, `P_Youth`, `P_Cook`, `P_DIY`: The mean differences for these covariates are small and not statistically significant, based on the p-values being greater than 0.05.
+
+`P_Art`: The mean difference is 0.57, which suggests that the `Choice==1` group tends to purchase more from the Art department compared to the `Choice==0` group. The Satterthwaite t-test statistic is -14.58, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
+
+*Satterthwaite t-test assumes non-normally distributed data with unequal variances
+
+**Mann-Whitney U test assumes non-normally distributed data with equal variances
 
 # Results
 ## Performance
@@ -188,6 +327,13 @@ Based on the performance metrics, the logistic regression model appears to be th
 
 ## Recommendations
 If the company wants to develop in-house capability to evaluate its direct mail campaigns, it may be beneficial to develop expertise in all three methods, as each method has its own strengths and weaknesses that may be relevant depending on the specific problem being addressed. For example, if the company is interested in predicting the probability of response to a direct mail campaign, logistic regression may be a good choice, while if the company is interested in identifying the most important features for predicting response, SVM with a linear kernel and L1 regularization may be a good choice. Linear regression may be useful in some cases where the relationship between the features and response is expected to be linear.
+
+## Linear Regression Is Not Appropriate For Our Use-Case
+It is important to use the appropriate regression technique for the given data and research question. In this case, the research question is to predict whether a customer will purchase a book or not based on their characteristics. Since the response variable (purchase or not) is categorical, logistic regression is the appropriate technique to use, not linear regression.
+
+Linear regression assumes a linear relationship between the predictor variables and the response variable, which may not be appropriate for a categorical response variable. Additionally, linear regression models can predict values outside the range of the response variable, which does not make sense for a binary response. Logistic regression, on the other hand, models the probability of the response variable given the predictor variables, and ensures that the predicted probabilities are within the range of 0 to 1.
+
+Therefore, using linear regression for this problem would not be appropriate, and the resulting model would likely have poor performance and be unreliable for predicting the probability of a customer making a purchase. It is important to choose the appropriate regression technique based on the nature of the data and the research question at hand.
 
 ## Next steps
 To simplify and automate the recommended methods for future modeling efforts at the company, it may be helpful to develop a pipeline that takes in the data, performs preprocessing (e.g., missing value imputation, scaling), fits the models, evaluates the performance using relevant metrics, and generates visualizations (e.g., SHAP plots) to aid in interpretation. This pipeline can be customized for the specific problem being addressed and can be run automatically to generate new models as new data becomes available. Additionally, it may be useful to develop guidelines and best practices for data collection, preprocessing, and modeling to ensure consistency and reproducibility across modeling efforts.

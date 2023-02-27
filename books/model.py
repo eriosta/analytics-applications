@@ -316,7 +316,7 @@ class BBBC_Model:
 
         return best_model, model
     
-    def shap_analysis(self, model, X_test, plot_dependence=False):
+    def shap_analysis(self, model, X_test, plot_dependence=True):
             """
             Performs SHAP analysis on the given model and test data and visualizes the SHAP values for the first instance in the test data. Optionally, the method can also visualize two-way dependence plots for each feature.
 
@@ -340,7 +340,7 @@ class BBBC_Model:
             shap_values = explainer(X_test)
 
             # Visualize the SHAP values for the first instance in the test data
-            shap.plots.waterfall(shap_values[0], max_display=10)
+            # shap.plots.waterfall(shap_values[0], max_display=10)
             
             # Compute the SHAP summary plot
             shap.summary_plot(shap_values, X_test)
