@@ -151,6 +151,8 @@ Linear regression, logistic regression, and SVM are all commonly used machine le
 
 [Source code](https://github.com/eriosta/analytics-applications/blob/main/books/model.py)
 
+[Jupyter notebook](https://github.com/eriosta/analytics-applications/blob/main/books/main.ipynb)
+
 ### Class `BBBC_Model`
 The `BBBC_Model` class provides a collection of methods for building, training, evaluating, and selecting the best model for a binary classification problem based on customer purchase behavior. Here is the high-level documentation for the classes and their methods:
 
