@@ -287,7 +287,11 @@ The `preprocess_data` method preprocesses the data by removing missing values, c
 ## Analysis
 The `analyze_high_cardinality` method identifies columns in the data that have high cardinality, meaning they have a high proportion of unique values to the number of rows.
 
+Cardinality analysis did not reveal high cardinality between variables at 0.9 threshold. 
+
 The `spearman_correlation` method performs Spearman correlation on the data and visualizes the correlation matrix.
+
+The data suggest that there is a positive correlation between `First_purchase` and `Last_purchase`, `First_purchase` and `Frequency`, `P_Child` and `Last_purchase`, `P_Cook` and `Last_purchase`.
 
 ## Summary Statistics
 `Gender`: The mean difference is -0.164, which suggests that the proportion of males in the `Choice==1` group is lower than that in the `Choice==0` group. The Satterthwaite t-test* statistic is 7.52, and the p-value is very small (less than 0.001), indicating that the mean difference is statistically significant.
