@@ -146,7 +146,14 @@ Linear regression, logistic regression, and SVM are all commonly used machine le
 
 
 # Data
-Data processing stuff, distributions
+## Preprocessing
+The `preprocess_data` method preprocesses the data by removing missing values, creating dummy variables for categorical variables, and splitting the data into training and testing sets using the specified test size. If custom training and testing files are provided, they are loaded and split into training and testing sets. The method then returns the preprocessed training and testing sets as pandas DataFrames.
+## Analysis
+The `analyze_high_cardinality` method identifies columns in the data that have high cardinality, meaning they have a high proportion of unique values to the number of rows.
+
+The `spearman_correlation` method performs Spearman correlation on the data and visualizes the correlation matrix.
+
+
 
 # Results
 ## Performance

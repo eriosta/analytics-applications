@@ -2,6 +2,8 @@ import statsmodels.api as sm
 from sklearn.svm import SVC
 from sklearn.utils import resample
 import pandas as pd
+import warnings
+warnings.filterwarnings('ignore', category=pd.errors.PerformanceWarning)
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
@@ -11,6 +13,9 @@ import shap
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+from scipy.stats import shapiro, levene, ttest_ind, mannwhitneyu, t
+import researchpy as rp
+
 
 class BBBC_Model:
     """
@@ -86,6 +91,73 @@ class BBBC_Model:
         cmap = sns.diverging_palette(230, 20, as_cmap=True)
         sns.heatmap(corr, mask=mask, cmap=cmap, center=0, square=True, linewidths=.5, cbar_kws={"shrink": .5})
         plt.show()
+        
+    def summarize_stats(self, data, response_var=None):
+        """
+        Performs summary statistics between response_var==1 and response_var==0 and generates a table with the following:
+        - variable name
+        - mean difference
+        - test type (t-test, Mann-Whitney U test, etc.)
+        - statistic
+        - p-value
+        - confidence intervals
+
+        :param data: pandas DataFrame
+        """
+        response_var = self.response_var
+        variables = data.columns.drop(response_var)
+        summary_table = pd.DataFrame(columns=['Variable', 'Mean difference', 'Test type', 'Statistic', 'P-value', 'Confidence interval'])
+
+        for var in variables:
+            # Split the data into two groups based on response variable
+            group1 = data.loc[data[response_var] == 0, var]
+            group2 = data.loc[data[response_var] == 1, var]
+            # Compute the mean difference
+            mean_diff = group2.mean() - group1.mean()
+            # Check for normality and equal variances
+            equal_var = False
+            normality = False
+            stat, pval = 0, 0
+            ci = ''
+
+            # Normality test
+            if shapiro(group1)[1] > 0.05 and shapiro(group2)[1] > 0.05:
+                normality = True
+
+            # Equal variance test
+            if levene(group1, group2)[1] > 0.05:
+                equal_var = True
+
+            # Perform appropriate test based on normality and equal variance
+            test_type = ''
+            if not equal_var and not normality:
+                result = rp.ttest(group1, group2, equal_variances=False)
+                stat = result[1]['results'][2]
+                pval = result[1]['results'][3]
+                test_type = 'Satterthwaite t-test'
+            elif equal_var and not normality:
+                stat, pval = mannwhitneyu(group1, group2)
+                test_type = 'Mann-Whitney U test'
+            elif not equal_var and normality:
+                stat, pval = ttest_ind(group1, group2, equal_var=False)
+                test_type = 'Welch\'s t-test'
+            else:
+                stat, pval = ttest_ind(group1, group2, equal_var=True)
+                test_type = 'Independent t-test'
+
+            # Compute confidence interval
+            diff_std = (group1.std() ** 2 / group1.size + group2.std() ** 2 / group2.size) ** 0.5
+            se = diff_std * t.ppf(1 - 0.05 / 2, group1.size + group2.size - 2)
+            lower_ci = mean_diff - se
+            upper_ci = mean_diff + se
+            ci = f'[{lower_ci:.2f}, {upper_ci:.2f}]'
+
+            # Add results to summary table
+            row = {'Variable': var, 'Mean difference': mean_diff, 'Test type': test_type, 'Statistic': stat, 'P-value': pval, 'Confidence interval': ci}
+            summary_table = summary_table.append(row, ignore_index=True)
+
+        return summary_table
+
 
     def preprocess_data(self, data=None):
         """
