@@ -24,7 +24,7 @@ Machine learning approaches have been used extensively in predicting book buying
   </tr>
   <tr>
     <td>Choice</td>
-    <td>Whether the customer purchased The Art History of Florence. 1 corresponds to a purchase and 0 corresponds to a non-purchase.</td>
+    <td>Whether the customer purchased a book. 1 corresponds to a purchase and 0 corresponds to a non-purchase.</td>
   </tr>
   <tr>
     <td>Gender</td>
