@@ -316,10 +316,14 @@ Overall, we found that linear regression was the most common and best performing
 
 Specifically, we found that linear regression was the best model for predicting trends in stocks AA, AXP, BAC, CAT, DD, DIS, GE, HD, JPM, KRFT, MMM, MRK, MSFT, PFE, T, TRV, UTX, and VZ. The trends for stocks CVX, HPQ, INTC, JNJ, KO, MCD, and XOM were best predicted using Ridge regression. XGBoost was the best model for stocks BA, CSCO, and WMT, while Lasso regression and Elastic Net regression were the best models for predicting trends in IBM and PG, respectively.
 
-The individual RMSE, MAE, APE, and R2 values for all six models per each stock, along with their calculated custom metric, can be found in the supplemental `./evaluation_metrics` directory.
+The individual RMSE, MAE, APE, and R2 values for all six models per each stock, along with their calculated custom metric, can be found in the supplemental `./evaluation_metrics` directory (link [here](https://github.com/eriosta/analytics-applications/tree/main/stock_market/evaluation_metrics)).
+
+![Best Performing Models by Stock](https://user-images.githubusercontent.com/84827743/229398922-e267f310-8b79-4c6e-8ad2-7ac41ff8cae0.png)
 
 ## Stock Risk
 To assess the risk of each stock, we first calculated the weekly return for each week by subtracting the opening price from the closing price and dividing by the opening price. This gives us a percentage change in price for that week, which represents the weekly return for that stock. We then calculated the standard deviation of the weekly returns for each stock across all weeks to determine the stock volatility. This metric reflects the degree of fluctuation in returns over time and is commonly used to measure stock risk. We ranked the stocks by their risk and compared them to the median risk value for all stocks. Based on our analysis, we found that CSCO, HPQ, BAC, AA, AXP, MRK, HD, DIS, DD, PFE, BA, CAT, XOM, TRV, and CVX had risks above the median, while JPM, MCD, MMM, GE, INTC, KO, IBM, KRFT, T, WMT, JNJ, UTX, MSFT, VZ, and PG had risks below the median.
+
+![Risks by Stock](https://user-images.githubusercontent.com/84827743/229398947-b0a8b8ec-df99-463d-bace-3e339bbe578b.png)
 
 # VII. Conclusions and Recommendations
 
