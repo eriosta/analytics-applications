@@ -1,0 +1,14 @@
+Best Model: Linear Regression
+Metric Score: 2.437264273117709
+
+How Metric Score was calculated: 
+The metric score is calculated as the sum of the RMSE, MAE, APE values, and 1 minus the R2 value. The model with the lowest metric score is considered the best performing model.
+
+                    model      RMSE       MAE         R2       APE
+0       Linear Regression  0.426925  0.201335  -0.155776  0.653228
+1           Decision Tree  2.027922  1.985385 -25.077899  6.416017
+2                 XGBoost  2.061881  2.023454 -25.958584  6.539369
+3                     SVR  2.656407  2.625220 -43.746501  8.488774
+4        Ridge Regression  1.464186  1.289384 -12.594481  4.168467
+5        Lasso Regression  2.532035  2.404747 -39.654558  7.773902
+6  Elastic Net Regression  2.506987  2.372107 -38.854186  7.669192

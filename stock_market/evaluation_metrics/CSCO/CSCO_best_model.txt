@@ -1,0 +1,14 @@
+Best Model: XGBoost
+Metric Score: 10.125976835308558
+
+How Metric Score was calculated: 
+The metric score is calculated as the sum of the RMSE, MAE, APE values, and 1 minus the R2 value. The model with the lowest metric score is considered the best performing model.
+
+                    model      RMSE       MAE         R2        APE
+0       Linear Regression  2.756848  2.598079  -7.836420  15.594651
+1           Decision Tree  1.406797  1.115385  -1.300983   7.077722
+2                 XGBoost  1.253721  0.954741  -0.827479   6.090036
+3                     SVR  2.333555  2.136890  -5.331211  13.310640
+4        Ridge Regression  3.154292  3.048224 -10.567902  18.365072
+5        Lasso Regression  3.634933  3.526652 -14.361852  21.278388
+6  Elastic Net Regression  3.486474  3.386854 -13.132649  20.420828
