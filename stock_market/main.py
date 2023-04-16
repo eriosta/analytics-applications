@@ -1,11 +1,8 @@
-import pandas as pd
+import subprocess
 
-# Read the data file
-data = pd.read_csv("stock_market/dow_jones_index.data")
+def convert_md_to_pdf(md_file_path, pdf_file_path):
+    # call pandoc using subprocess module
+    subprocess.run(['pandoc', md_file_path, '-o', pdf_file_path])
 
-# Read the names file
-with open("stock_market/dow_jones_index.names") as f:
-    names = f.read()
-
-print(data.head())
-print(names)
+# usage example
+convert_md_to_pdf('stock_market/README.md', 'stock_market/Report.pdf')
