@@ -105,9 +105,9 @@ $\text{MAE} = \text{mean}(|y_\text{true} - y_\text{pred}|)$
 ### R-squared (R^2) score
 The R-squared score measures the proportion of the variance in the target variable that is explained by the model. It ranges from 0 to 1, with higher values indicating better performance. A value of 0 means that the model does not explain any variance in the target variable, while a value of 1 means that the model perfectly explains the variance in the target variable. The formula for R-squared is as follows:
 
-$R^2 = 1 - \frac{\text{SS}_\text{res}}{\text{SS}_\text{tot}}$
+$R^2 = 1 - \frac{\text{SS}\text{res}}{\text{SS}\text{tot}}$
 
-where $\text{SS}_\text{res}$ is the sum of squared residuals and $\text{SS}_\text{tot}$ is the total sum of squares.
+where $\text{SS}\text{res}$ is the sum of squared residuals and $\text{SS}\text{tot}$ is the total sum of squares.
 
 ### Average Percentage Error (APE)
 The APE measures the average percentage difference between the predicted and actual values. It is calculated as the average of the absolute percentage differences between the predicted and actual values. The lower the APE value, the better the model's performance. The formula for APE is as follows:
