@@ -261,6 +261,8 @@ Out of the 500 instances, 338 were acquired while 162 were not. The median durat
 </tbody>
 </table>
 
+To see the complete exploratory data analysis, please visit: https://eriosta.github.io/analytics-applications/customers/index.html.
+
 ## K-fold Cross-Validation
 The k-fold cross-validation results show that the classifier has a mean AUCROC of 0.8648, and the regressor has a mean R2 score of 0.9651.
 
