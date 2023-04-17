@@ -108,6 +108,8 @@ The Python class `CustomerRetention` [[source]](https://github.com/eriosta/analy
 
 The main purpose of this code is to analyze customer retention data, train machine learning models to predict customer acquisition and retention duration, and evaluate the performance of these models using various metrics and visualizations.
 
+Go to [this Jupyter notebook](https://github.com/eriosta/analytics-applications/blob/main/customers/main.ipynb) to see an implementation of the code. 
+
 ### Root Mean Squared Error (RMSE)
 The RMSE measures the average distance between the predicted and actual values. It is calculated as the square root of the average of the squared differences between the predicted and actual values. The lower the RMSE value, the better the model's performance. The formula for RMSE is as follows:
 
