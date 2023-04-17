@@ -86,11 +86,27 @@ Additionally, we performed K-fold cross-validation, an important technique in ma
 
 ## Data Source
 
-The `SMCRM` package provides a collection of datasets related to customer relationship management [1]. The "acquisitionRetention" dataset is one of the datasets included in this package, and contains information on customer acquisition and retention for a fictional company. The source of the data is not specified, but it was likely generated for the purpose of demonstrating analysis techniques related to customer relationship management.
+The `SMCRM` package provides a collection of datasets related to customer relationship management [1]. The "acquisitionRetention" dataset is one of the datasets included in this package, and contains information on customer acquisition and retention for a fictional company. The source of the data is not specified, but it was likely generated for the purpose of demonstrating analysis techniques related to customer relationship management. Use [main.R](https://github.com/eriosta/analytics-applications/blob/main/customers/main.R) to download original data. 
 
 ## Data Modeling
 
-We used the scikit-learn library to implement the random forest algorithms. We also used the SHAP (SHapley Additive exPlanations) library to perform feature importance analysis and generate SHAP plots.
+The Python class `CustomerRetention` [[source]](https://github.com/eriosta/analytics-applications/blob/main/customers/main.py) is designed to analyze customer retention data. The class has several methods that perform various tasks such as data preprocessing, data visualization, model training, and model evaluation. The code also imports required libraries and packages for data manipulation, machine learning, and visualization. Below is a brief description of each method in the `CustomerRetention` class:
+
+* `__init__()`: Initializes the class, reads the data from the CSV file, and sets the required features and models.
+
+* `perform_k_fold_cross_validation()`: Performs k-fold cross-validation on the `RandomForestClassifier` and `RandomForestRegressor` models to estimate their performance.
+
+* `print_corr_matrix()`: Plots the correlation matrix of the features in the dataset using a heatmap.
+
+* `predict_acquisition_and_duration()`: Trains the `RandomForestClassifier` and `RandomForestRegressor` models to predict customer acquisition and retention duration, respectively.
+
+* `hyperparameter_optimization()`: Optimizes the hyperparameters of the `RandomForestClassifier` model using `GridSearchCV` and prints the feature importances.
+
+* `compare_models()`: Compares the performance of different models (`RandomForestRegressor`, `RandomForestClassifier`, and `LogisticRegression`) using various evaluation metrics and calculates their confidence intervals using bootstrap resampling.
+
+* `shap_analysis()`: Performs SHAP (SHapley Additive exPlanations) analysis on the `RandomForestClassifier` and `RandomForestRegressor` models, and generates summary and dependence plots to visualize feature importances and their impact on the model predictions.
+
+The main purpose of this code is to analyze customer retention data, train machine learning models to predict customer acquisition and retention duration, and evaluate the performance of these models using various metrics and visualizations.
 
 ### Root Mean Squared Error (RMSE)
 The RMSE measures the average distance between the predicted and actual values. It is calculated as the square root of the average of the squared differences between the predicted and actual values. The lower the RMSE value, the better the model's performance. The formula for RMSE is as follows:
