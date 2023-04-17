@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, recall_score, precision_score, accuracy_score, roc_auc_score
 import shap
 from sklearn.model_selection import cross_val_score
@@ -21,6 +22,7 @@ class CustomerRetention:
         self.data_acquired = self.df[self.data['acquisition'] == 1]
         self.rf_dur = RandomForestRegressor(random_state=42)
         self.rf_acq = RandomForestClassifier(random_state=42)
+        self.logit_acq = LogisticRegression(random_state=42)
 
 
     def perform_k_fold_cross_validation(self, k=5):
@@ -66,6 +68,9 @@ class CustomerRetention:
         self.rf_acq.fit(X_train_acq, y_train_acq)
         self.rf_dur.fit(X_train_dur, y_train_dur)
 
+        self.logit_acq.fit(X_train_acq, y_train_acq)
+
+
         # Make predictions
         y_pred_acq = self.rf_acq.predict(X_test_acq)
         y_pred_dur = self.rf_dur.predict(X_test_dur)
@@ -76,7 +81,6 @@ class CustomerRetention:
         self.X_train_dur, self.X_test_dur = X_train_dur, X_test_dur
         self.y_train_dur, self.y_test_dur = y_train_dur, y_test_dur
         self.y_pred_acq, self.y_pred_dur = y_pred_acq, y_pred_dur
-
 
     def hyperparameter_optimization(self):
         # Task 2: Compute variable importance to detect interactions and optimize hyperparameters for acquired customers.
@@ -110,9 +114,8 @@ class CustomerRetention:
         for f in range(X.shape[1]):
             print("%d. %s (%f)" % (f + 1, X.columns[indices[f]], importances[indices[f]]))
 
-
     def compare_models(self, model_type):
-        
+
         def bootstrap_ci(y_true, y_pred, func, n_bootstrap=1000, alpha=0.05):
             indices = np.arange(len(y_true))
             bootstrap_samples = [func(y_true[resampled_indices], y_pred[resampled_indices]) for resampled_indices in (resample(indices) for _ in range(n_bootstrap))]
@@ -135,22 +138,26 @@ class CustomerRetention:
             y_pred = model.predict(self.X_test)
             metrics = ['Accuracy', 'Recall', 'Precision', 'AUROC']
             metric_funcs = [accuracy_score, recall_score, precision_score, roc_auc_score]
-
+        
+        elif model_type == 'logit':
+            model = LogisticRegression(random_state=42)
+            model.fit(self.X_train, self.y_train_acq)
+            y_pred = model.predict(self.X_test)
+            metrics = ['Accuracy', 'Recall', 'Precision', 'AUROC']
+            metric_funcs = [accuracy_score, recall_score, precision_score, roc_auc_score]
 
         else:
-            print("Invalid model type. Choose either 'regressor' or 'classifier'.")
+            print("Invalid model type. Choose either 'regressor' or 'classifier' or 'logit'")
             return
 
         results_with_ci = []
         for metric, metric_func in zip(metrics, metric_funcs):
-            result = metric_func(self.y_test_acq if model_type == 'classifier' else self.y_test_dur, y_pred)
-            ci = bootstrap_ci(self.y_test_acq.values if model_type == 'classifier' else self.y_test_dur.values, y_pred, metric_func, n_bootstrap, alpha)
+            result = metric_func(self.y_test_acq if model_type in ['classifier', 'logit'] else self.y_test_dur, y_pred)
+            ci = bootstrap_ci(self.y_test_acq.values if model_type in ['classifier', 'logit'] else self.y_test_dur.values, y_pred, metric_func, n_bootstrap, alpha)
             results_with_ci.append((result, ci))
 
         results_df = pd.DataFrame(results_with_ci, columns=['Mean', 'CI'], index=metrics)
         print(results_df)
-
-
 
     def shap_analysis(self, model_type):
         """
